@@ -68,6 +68,57 @@ Aizen* Addition(Aizen*tmp1, Aizen*tmp2) {
     return head;
 }
 
+//For Multiplication we can use the same logic as addition but with more nested loops and more carry handling.
+
+// Multiply a single digit with a linked list
+Aizen* MultiplyDigit(Aizen *num, int digit) {
+    Aizen *head = NULL, *end = NULL;
+    int carry = 0;
+    while(num || carry) { // loop until all digits processed and carry becomes 0
+        int prod = carry + (num ? num->data *digit : 0);
+        Aizen* newNode = Create(prod % 10);
+        carry = prod / 10;
+        if(!head) 
+            head = end = newNode;
+        else { 
+            end->next = newNode; 
+            end = newNode; 
+        }
+        if(num) num = num->next;
+    }
+    return head;
+}
+
+// Add zeros at the beginning of linked list
+Aizen* Zeros(Aizen *head, int zeros) {
+    for(int i = 0; i < zeros; i++) {
+        Aizen *newNode = Create(0);
+        newNode->next = head;
+        head = newNode;
+    }
+    return head;
+}
+
+// Multiply two numbers represented as reversed linked lists
+Aizen* Multiplication(Aizen *num1, Aizen *num2) {
+    Aizen *result = Create(0); // Initialize result as 0
+    Aizen *ptr2 = num2;
+    int shift = 0;
+
+    while(ptr2) {
+        // Multiply num1 by current digit of num2
+        Aizen* temp = MultiplyDigit(num1, ptr2->data);
+        // Shift according to position
+        temp = Zeros(temp, shift);
+        // Add to running result using your Addition function
+        result = Addition(result, temp);
+        ptr2 = ptr2->next;
+        shift++;
+    }
+
+    return result;
+}
+
 //For Printing the LL in reverse order
 void printList(Aizen*head) {
     if(head == NULL){
@@ -103,8 +154,13 @@ int main() {
     printf("Linked list for sum: ");
     DisplayLL(sum);
 
-    printf("\nResult = ");
+    printf("\nAddition = ");
     printList(sum);
+    printf("\n");
+
+    printf("\nMultiplication = ");
+    Aizen*product = Multiplication(head1, head2);
+    printList(product);
     printf("\n");
 
     return 0;
