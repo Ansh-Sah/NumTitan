@@ -3,10 +3,14 @@
 #include<string.h>
 #include<ctype.h>
 
+
 typedef struct node {
     int data;
     struct node*next;
 }Aizen;
+
+//Function Prototype
+Aizen* Subtraction(Aizen* num1, Aizen* num2); 
 
 void DisplayLL(Aizen* head) {
     while(head != NULL) {
@@ -151,17 +155,84 @@ int main() {
     DisplayLL(head2);
 
     Aizen*sum = Addition(head1, head2);
-    printf("Linked list for sum: ");
+    printf("\nLinked list for sum: ");
     DisplayLL(sum);
 
     printf("\nAddition = ");
     printList(sum);
     printf("\n");
 
+    Aizen *diff = Subtraction(head1, head2);
+    printf("\nLinked list for difference: ");
+    DisplayLL(diff);
+
+    printf("\nSubtraction = ");
+    printList(diff);
+    printf("\n");
+
+
+    Aizen *product = Multiplication(head1, head2);
+    printf("\nLinked list for multiplication: ");
+    DisplayLL(product);
+
     printf("\nMultiplication = ");
-    Aizen*product = Multiplication(head1, head2);
     printList(product);
     printf("\n");
 
     return 0;
+}
+
+// Subtract two numbers represented as reversed linked lists (num1 - num2)
+// Assumes num1 >= num2
+Aizen* Subtraction(Aizen* num1, Aizen* num2) {
+    Aizen *head = NULL, *end = NULL;
+    int borrow = 0;
+
+    while (num1 != NULL || num2 != NULL) {
+        int sub = (num1 ? num1->data : 0) - (num2 ? num2->data : 0) - borrow;
+
+        if (sub < 0) {
+            sub += 10;
+            borrow = 1;
+        } else {
+            borrow = 0;
+        }
+
+        Aizen* newNode = Create(sub);
+        if (!head)
+            head = end = newNode;
+        else {
+            end->next = newNode;
+            end = newNode;
+        }
+
+        if (num1) num1 = num1->next;
+        if (num2) num2 = num2->next;
+    }
+
+    // Remove trailing zeros in reversed LL (leading zeros in normal number)
+    Aizen* prev = NULL;
+    Aizen* curr = head;
+    while (curr && curr->next) {
+        if (curr->next->data != 0)
+            prev = curr;
+        curr = curr->next;
+    }
+
+    // Free trailing zeros if any
+    if (prev && prev->next) {
+        Aizen* temp = prev->next;
+        prev->next = NULL;
+        while (temp) {
+            Aizen* del = temp;
+            temp = temp->next;
+            free(del);
+        }
+    }
+
+    // If all digits were zero (like 100-100), return single 0 node
+    if(!head)
+        return Create(0);
+
+    return head;
 }
